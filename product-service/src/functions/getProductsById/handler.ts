@@ -1,8 +1,8 @@
 import 'source-map-support/register';
 
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/apiGateway';
-import { formatJSONResponse } from '@libs/apiGateway';
-// import { middyfy } from '../../libs/lambda';
+import { formatJSONResponse } from '../../libs/apiGateway';
+import { middyfy } from '../../libs/lambda';
 
 import schema from './schema';
 import { findProductById } from '../../repository/products-repository';
@@ -30,5 +30,4 @@ const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
 
 }
 
-// export const main = middyfy(getProductsById);
-export const main = getProductsById;
+export const main = middyfy(getProductsById);

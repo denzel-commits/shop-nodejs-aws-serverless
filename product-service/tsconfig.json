@@ -11,6 +11,7 @@
     "outDir": "lib",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "serverless.ts"],
   "exclude": [
