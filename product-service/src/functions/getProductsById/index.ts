@@ -7,7 +7,7 @@ export default {
     {
       http: {
         method: 'get',
-        path: 'getProductsById',
+        path: 'getProductsById/{productId}',
         request: {}
       }
     }
