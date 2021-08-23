@@ -1,7 +1,8 @@
 const handler = require("../src/functions/getProductsList/handler");
 
-test("correct product list received", () => {
-  products = handler.main();
+test("correct product list received", async () => {
+  const response = await handler.main();
+  const products = JSON.parse(response.body);
 
   // let's test that each item in the product data has the correct properties
   for (let i = 0; i < products.length; i += 1) {
