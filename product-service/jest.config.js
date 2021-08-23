@@ -3,6 +3,6 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
   moduleNameMapper: {
-    "^@libs/(.*)$": "<rootDir>/libs/$1",
+    "^@libs/(.*)$": "<rootDir>/src/libs/$1",
   },
 };
