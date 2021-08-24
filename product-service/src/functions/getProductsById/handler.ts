@@ -17,9 +17,7 @@ const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
       });
     }  
   
-    return formatJSONResponse(200, {
-      product
-    });
+    return formatJSONResponse(200, product);
 
   }
   catch(e){

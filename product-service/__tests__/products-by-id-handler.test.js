@@ -8,8 +8,7 @@ test("correct product by id received", async () => {
   };
 
   const response = await handler.main(testEvent);
-  const body = JSON.parse(response.body);
-  const product = body.product;
+  const product = JSON.parse(response.body);
 
   expect(product).toHaveProperty("id");
   expect(product).toHaveProperty("title");

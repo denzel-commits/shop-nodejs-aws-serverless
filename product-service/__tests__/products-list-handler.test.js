@@ -1,4 +1,5 @@
 const handler = require("../src/functions/getProductsList/handler");
+// import { main as handler } from "../src/functions/getProductsList/handler";
 
 test("correct product list received", async () => {
   const response = await handler.main();
