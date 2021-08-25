@@ -56,6 +56,13 @@ const products = [
       "id": "7567ec4b-b10c-45c5-9345-fc73c48a80a1",
       "price": 119,
       "title": "JBL FLIP 5"
+    },
+    {
+    "count": 3,
+    "description": "Short Product Description7",
+    "id": "7567ec4b-b10c-45c5-9345-fc73c48a80a1",
+    "price": 119,
+    "title": "JBL FLIP 5"
     }
     ];
 
