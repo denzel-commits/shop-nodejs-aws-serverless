@@ -8,7 +8,7 @@ import schema from './schema';
 import { getAllProducts } from '../../repository/products-repository';
 
 const getProductsList: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async () => {
-    console.log("getProductsList lambda launched with event: ", event);
+    console.log("getProductsList lambda launched");
     try{
       const products = await getAllProducts();
       
