@@ -21,6 +21,7 @@ const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
 
   }
   catch(e){
+    console.log("Failed to fetch data", e);
     return formatJSONResponse(500, {
       message: "failed to fetch data"
     });
