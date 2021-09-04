@@ -38,16 +38,15 @@ const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
   await client.connect();
   
   try{
-    // const product = await findProductById(event.pathParameters.productId);
-    
-    const sql = 'SELECT a.*, b.count FROM public.products as a \
+
+    const sql = `SELECT a.*, b.count FROM public.products as a \
                  LEFT JOIN public.stocks as b ON b.product_id = a.id \
-                 WHERE a.id = ${event.pathParameters.productId}';
+                 WHERE a.id = '${event.pathParameters.productId}'`;
 
     const {rows: product} = await client.query(sql);
     console.log('rows: ', product);
 
-    if( !product ){
+    if( !product.length ){
       return formatJSONResponse(404, {
         message: 'Product not found'
       });

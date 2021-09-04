@@ -27,10 +27,8 @@ const getProductsList: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
 
     const client = new Client(dbOptions);
     await client.connect();
-    console.log('type: ', typeof(client));
     try{
-      
-      // const products = await getAllProducts();
+
       const sql = 'SELECT a.*, b.count FROM public.products as a LEFT JOIN public.stocks as b ON b.product_id = a.id';
       const {rows: products} = await client.query(sql);
       console.log('rows: ', products);
