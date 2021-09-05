@@ -27,34 +27,54 @@ const createProduct: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
     const {title, description, price, count} = event.body;
 
+    // -- VALIDATE INPUT DATA
+
+      // exists (not null)
+      // wrong type (string, int)
+      // incorrect values (negative price or count)
+
+    // -- CONNECT TO DATABASE
     const client = new Client(dbOptions);
     await client.connect();
-    try{
-
-      let sql = 'SELECT title FROM public.products WHERE title = $1'; // INSERT or UPDATE if exists
-      let result = await client.query(sql, [title]);
+    
+    // -- CHECK IF PRODUCT CAN BE ADDED
+    try{     
+      const checkTitleText = 'SELECT title FROM public.products WHERE title = $1';
+      const result = await client.query(checkTitleText, [title]);
 
       if(result){
         return formatJSONResponse(500, {
           message: "Product with such title already exists"
         });
       }
-     
-      let sql = 'INSERT INTO public.products (title, description, price) VALUES ($1, $2, $3) RETURNING id'; // INSERT or UPDATE if exists
-      let result = await client.query(sql, [title, description, price]);
 
-      const newlyCreatedProductId = result.rows[0].id;
-
-      sql = 'INSERT INTO public.stocks (product_id, count) VALUES ($1, $2)';
-      result = await client.query(sql, [newlyCreatedProductId, count]);
-      
-      return formatJSONResponse(200, result);
     }catch(e){
       console.log("Failed to fetch data", e);
       return formatJSONResponse(500, {
         message: "failed to fetch data"
       });
-    }finally{
+    }
+
+    // -- BEGIN TRANSACTION
+    try {
+      await client.query('BEGIN');
+      
+      const queryText = 'INSERT INTO public.products(title, description, price) VALUES($1, $2, $3) RETURNING id';
+      const res = await client.query(queryText, [title, description, price]);
+      const insertStocksText = 'INSERT INTO public.stocks(product_id, count) VALUES ($1, $2)';
+      const insertStocksValues = [res.rows[0].id, count];
+      await client.query(insertStocksText, insertStocksValues);
+      
+      await client.query('COMMIT');
+        
+      return formatJSONResponse(200, result);
+    } catch (e) {
+      await client.query('ROLLBACK');
+      console.log("ROLLBACK - Failed to add new product", e);
+      return formatJSONResponse(500, {
+        message: "ROLLBACK - failed to add new product"
+      });
+    } finally {
       client.end();
     }
 }
