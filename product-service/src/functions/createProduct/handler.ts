@@ -76,7 +76,9 @@ const createProduct: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
       const insertStocksValues = [res.rows[0].id, count];
       await client.query(insertStocksText, insertStocksValues);
       
-      await client.query('COMMIT');
+      await client.query('COMMIT');    
+
+      event.body.id = res.rows[0].id;
         
       return formatJSONResponse(200, event.body);
     } catch (e) {
