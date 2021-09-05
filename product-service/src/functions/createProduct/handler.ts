@@ -66,25 +66,6 @@ const createProduct: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
     const client = new Client(dbOptions);
     await client.connect();
     
-    // -- CHECK IF PRODUCT CAN BE ADDED
-    try{     
-      const checkTitleText = 'SELECT title FROM public.products WHERE title = $1';
-      const {rows: result} = await client.query(checkTitleText, [title]);
-
-      if(result.length){
-        return formatJSONResponse(500, {
-          message: "Product with such title already exists",
-          result
-        });
-      }
-
-    }catch(e){
-      console.log("Failed to fetch data", e);
-      return formatJSONResponse(500, {
-        message: "failed to fetch data"
-      });
-    }
-
     // -- BEGIN TRANSACTION
     try {
       await client.query('BEGIN');
