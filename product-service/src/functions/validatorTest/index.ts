@@ -7,18 +7,17 @@ export default {
     {
       http: {
         method: 'post',
-        path: 'products',
-        cors: true,
+        path: 'test',
         request: {
           schemas: {
             'application/json': {
               schema: schema,
-              name: 'ProductAutoModel',
+              name: 'ValidatorTestModel',
               description: 'REST Validate body',
             }
-          }
-       }
+        }
+      }
+      }
     }
-  }
   ]
 }
