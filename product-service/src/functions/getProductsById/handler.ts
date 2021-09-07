@@ -40,11 +40,11 @@ const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
   
   try{
 
-    const sql = `SELECT a.*, b.count FROM public.products as a \
+    const sql = 'SELECT a.*, b.count FROM public.products as a \
                  LEFT JOIN public.stocks as b ON b.product_id = a.id \
-                 WHERE a.id = '${event.pathParameters.productId}'`;
+                 WHERE a.id = $1';
 
-    const {rows: product} = await client.query(sql);
+    const {rows: product} = await client.query(sql, [event.pathParameters.productId]);
     console.log('rows: ', product);
 
     if( !product.length ){
