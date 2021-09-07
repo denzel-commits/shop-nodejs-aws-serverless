@@ -26,7 +26,45 @@ const createProduct: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
     console.log("createProduct lambda launched");
     console.log("Parameters", event.body);
 
+    if(typeof(event.body) === "string"){
+      event.body = JSON.parse(event.body);
+    }  
+
     const {title, description, price, count} = event.body;
+
+    // -- VALIDATE INPUT DATA
+
+      // exists
+      if(title === undefined || description === undefined || price === undefined || count === undefined ){
+        return formatJSONResponse(400, {
+          message: 'Product data is invalid. Missing one or more properties. Example: {"title": "title", "description": "desc", "price": 100, "count": 40}',
+          body: event.body
+        });
+      }
+      
+      // wrong type (string, int)
+      if( typeof(title) !== 'string' || typeof(description) !== 'string' || typeof(price) !== 'number' || typeof(count) !== 'number' ){
+        return formatJSONResponse(400, {
+          message: "Product data is invalid. Invalid property type.",
+          body: event.body
+        });
+      }
+
+      // not empty
+      if(title === '' || description === '' ){
+        return formatJSONResponse(400, {
+          message: 'Product data is invalid. Title and description must be not empty strings.',
+          body: event.body
+        });
+      }
+
+      // incorrect values (negative price or count)
+      if( price < 0 || count < 0 ){
+        return formatJSONResponse(400, {
+          message: "Product data is invalid. Price and count must be positive integer values.",
+          body: event.body
+        });
+      }
 
     // -- CONNECT TO DATABASE
     const client = new Client(dbOptions);
