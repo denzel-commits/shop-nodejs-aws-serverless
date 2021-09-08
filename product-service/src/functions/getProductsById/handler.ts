@@ -29,16 +29,16 @@ const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
                  LEFT JOIN public.stocks as b ON b.product_id = a.id \
                  WHERE a.id = $1';
 
-    const {rows: product} = await client.query(sql, [event.pathParameters.productId]);
-    console.log('rows: ', product);
+    const {rows: products} = await client.query(sql, [event.pathParameters.productId]);
+    console.log('rows[0]: ', products[0]);
 
-    if( !product.length ){
+    if( !products.length ){
       return formatJSONResponse(404, {
         message: 'Product not found'
       });
     }  
   
-    return formatJSONResponse(200, product);
+    return formatJSONResponse(200, products[0]);
 
   }
   catch(e){
@@ -46,6 +46,8 @@ const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
     return formatJSONResponse(500, {
       message: "failed to fetch data"
     });
+  }finally{
+    await client.end();
   }
 
 }

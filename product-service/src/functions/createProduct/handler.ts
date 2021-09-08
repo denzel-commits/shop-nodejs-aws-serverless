@@ -78,7 +78,7 @@ const createProduct: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
         message: "ROLLBACK - failed to add new product"
       });
     } finally {
-      client.end();
+      await client.end();
     }
 }
 
