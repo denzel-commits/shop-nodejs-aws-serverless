@@ -7,14 +7,15 @@ import { middyfy } from '@libs/lambda';
 
 import schema from './schema';
 import { dbOptions } from '../../config/database-config';
+import { HTTP_STATUS_CODES } from '../../utils/constants';
 
 const createProduct: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
     console.log("createProduct lambda launched");
     console.log("Parameters", event.body);
 
     if(typeof(event.body) === "string"){
-      return formatJSONResponse(415, {
-        message: `Unsupported media type Content-Type: ${event.headers["Content-Type"]}. Please provide Content-Type: application/json.`,
+      return formatJSONResponse(HTTP_STATUS_CODES.UNSUPPORTED_MEDIA_TYPE, {
+        message: `Unsupported media type Content-Type: ${event.headers["Content-Type"]}. Please use Content-Type: application/json.`,
         event
       });
 
@@ -75,11 +76,11 @@ const createProduct: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
       event.body.id = res.rows[0].id;
         
-      return formatJSONResponse(200, event.body);
+      return formatJSONResponse(HTTP_STATUS_CODES.OK, event.body);
     } catch (e) {
       await client.query('ROLLBACK');
       console.log("ROLLBACK - Failed to add new product", e);
-      return formatJSONResponse(500, {
+      return formatJSONResponse(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, {
         message: "ROLLBACK - failed to add new product"
       });
     } finally {

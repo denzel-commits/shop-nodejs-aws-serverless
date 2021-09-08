@@ -1,21 +1,20 @@
 import 'source-map-support/register';
 import {Client} from 'pg';
-
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/apiGateway';
 import { formatJSONResponse } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
-
 import schema from './schema';
 import { dbOptions } from '../../config/database-config';
+import { HTTP_STATUS_CODES, UUID_V4_REGEX } from '../../utils/constants';
 
 const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   console.log("getProductsById lambda launched with event: ", event);
   console.log("Product Id: ", event.pathParameters.productId);
 
-  if( !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(event.pathParameters.productId) ){
+  if( !UUID_V4_REGEX.test(event.pathParameters.productId) ){
     console.log("Invalid v4 UUID provided");
 
-    return formatJSONResponse(500, {
+    return formatJSONResponse(HTTP_STATUS_CODES.BAD_REQUEST, {
       message: "Invalid v4 UUID provided"
     });
   }
@@ -33,17 +32,17 @@ const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
     console.log('rows[0]: ', products[0]);
 
     if( !products.length ){
-      return formatJSONResponse(404, {
+      return formatJSONResponse(HTTP_STATUS_CODES.NOT_FOUND, {
         message: 'Product not found'
       });
     }  
   
-    return formatJSONResponse(200, products[0]);
+    return formatJSONResponse(HTTP_STATUS_CODES.OK, products[0]);
 
   }
   catch(e){
     console.log("Failed to fetch data: ", e);
-    return formatJSONResponse(500, {
+    return formatJSONResponse(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, {
       message: "failed to fetch data"
     });
   }finally{
