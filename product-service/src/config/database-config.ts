@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv';
+dotenv.config()
 const {PG_HOST, PG_PORT, PG_DBNAME, PG_USERNAME, PG_PASSWORD} = process.env;
 
 const dbOptions = {

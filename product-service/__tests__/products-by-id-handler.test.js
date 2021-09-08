@@ -2,13 +2,13 @@ const handler = require("../src/functions/getProductsById/handler");
 
 const testEvent = {
   pathParameters: {
-    productId: "7567ec4b-b10c-48c5-9345-fc73c48a80aa",
+    productId: "8e662468-583f-4acf-b752-054dde14f270",
   },
 };
 
 const negativeTestEvent = {
   pathParameters: {
-    productId: "bdb7f1e4-9e7e-4973-9a01-3d0344d1abf7",
+    productId: "bdb7f1e4-9e7e-4973-9a03-3d0344d1abf7",
   },
 };
 

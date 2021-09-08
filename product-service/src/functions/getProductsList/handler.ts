@@ -7,6 +7,7 @@ import { middyfy } from '@libs/lambda';
 
 import schema from './schema';
 import { dbOptions } from '../../config/database-config';
+import { HTTP_STATUS_CODES } from '../../utils/constants';
 
 const getProductsList: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async () => {
     console.log("getProductsList lambda launched");
@@ -19,10 +20,10 @@ const getProductsList: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
       const {rows: products} = await client.query(sql);
       console.log('rows: ', products);
       
-      return formatJSONResponse(200, products);
+      return formatJSONResponse(HTTP_STATUS_CODES.OK, products);
     }catch(e){
       console.log("Failed to fetch data", e);
-      return formatJSONResponse(500, {
+      return formatJSONResponse(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, {
         message: "failed to fetch data"
       });
     }finally{
