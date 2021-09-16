@@ -1,4 +1,5 @@
 // import products from './mock-products.json';
+import {IProduct} from '../interfaces/product';
 
 const products = [
     {
@@ -67,11 +68,11 @@ const products = [
     ];
 
 
-const getAllProducts = async () => {
+const getAllProducts = async ():Promise<IProduct[]> => {
     return products;
 }
 
-const findProductById = async (slug: string) => {
+const findProductById = async (slug: string):Promise<IProduct> => {
     const product = products.find( (product) => product.id === slug );
 
     if(!product){
