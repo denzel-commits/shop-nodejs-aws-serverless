@@ -10,8 +10,11 @@
     "node": ">=14.15.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.31.0",
+    "@aws-sdk/s3-request-presigner": "3.31.0",
     "@middy/core": "^1.5.2",
     "@middy/http-json-body-parser": "^1.5.2",
+    "aws-sdk": "2.990.0",
     "source-map-support": "^0.5.19"
   },
   "devDependencies": {
