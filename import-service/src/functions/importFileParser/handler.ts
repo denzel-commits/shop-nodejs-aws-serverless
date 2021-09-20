@@ -1,44 +1,62 @@
 import 'source-map-support/register';
 
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/apiGateway';
+import csv from 'csv-parser';
+
 import { formatJSONResponse } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
 
-import schema from './schema';
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-// import AWS from "aws-sdk";
+import AWS from "aws-sdk";
 
 const BUCKET = 'shop-products-source';
 
-const importProductsFile: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
-    console.log("importProductsFile lambda launched");
+const importFileParser = async (event) => {
+    console.log("importFileParser lambda launched");
     console.log(event);
-
-    const fileName = event.queryStringParameters.name;
-
     const clientParams = {region: 'eu-west-1'};
+    const results = [];
+    const parser = csv({separator: ';'});
 
     try{      
-      const getObjectParams = {Bucket: BUCKET, Key: `uploaded/${fileName}`};
+      const s3 = new AWS.S3(clientParams);
 
-      const client = new S3Client(clientParams);
-      const command = new GetObjectCommand(getObjectParams);
-      const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+      for(const record of event.Records){
+        
+        const s3Stream = s3.getObject({
+          Bucket: BUCKET,
+          Key: record.s3.object.key
+        }).createReadStream();
 
-      // const s3 = new AWS.S3(clientParams);
+        s3Stream
+        .pipe(parser)
+        .on('data', (data) => results.push(data))
+        .on('end', async () => {
+          //output
+          console.log(results);
 
-      // const params = {Bucket: BUCKET, Key: `uploaded/${fileName}`};
-      // const url = s3.getSignedUrl('getObject', params);
-      console.log('The URL is', url);
+          //copy to parsed
+          await s3.copyObject({
+            Bucket: BUCKET,
+            CopySource: BUCKET + '/' + record.s3.object.key,
+            Key: record.s3.object.key.replace('uploaded', 'parsed')
+          }).promise();
+
+          //delete
+          await s3.deleteObject({
+            Bucket: BUCKET, 
+            Key: record.s3.object.key
+          }).promise();
+
+        });
+
+      }
       
-      return formatJSONResponse(200, {url});
+      return formatJSONResponse(200, {message: 'products parsed successfully'});
     }catch(e){
-      console.log("Failed to fetch data", e);
+      console.log("Failed to parse data", e);
       return formatJSONResponse(500, {
-        message: "failed to fetch data"
+        message: "Failed to parse data"
       });
     }
 }
 
-export const main = middyfy(importProductsFile);
+export const main = middyfy(importFileParser);

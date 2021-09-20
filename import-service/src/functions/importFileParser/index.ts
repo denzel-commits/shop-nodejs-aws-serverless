@@ -7,10 +7,12 @@ export default {
     s3: {
       bucket: 'shop-products-source',
       event: 's3:ObjectCreated:*',
-      rules: {
+      rules: [
+        {
         prefix: 'uploaded/',
         suffix: '.csv'
-      },
+      }
+    ],
       existing: true
     }
     }
