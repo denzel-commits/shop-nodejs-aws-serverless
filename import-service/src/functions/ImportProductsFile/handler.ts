@@ -9,7 +9,9 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 // import AWS from "aws-sdk";
 
-const BUCKET = 'shop-products-source';
+import '../../config/config';
+
+const BUCKET = process.env.S3_BUCKET;
 
 const importProductsFile: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
     console.log("importProductsFile lambda launched");

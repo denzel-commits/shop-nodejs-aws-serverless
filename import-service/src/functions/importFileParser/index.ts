@@ -5,14 +5,12 @@ export default {
   events: [
     {
     s3: {
-      bucket: 'shop-products-source',
+      bucket: '${env:S3_BUCKET}',
       event: 's3:ObjectCreated:*',
       rules: [
-        {
-        prefix: 'uploaded/',
-        suffix: '.csv'
-      }
-    ],
+        { prefix: 'uploaded/' }, 
+        { suffix: '.csv' }
+      ],
       existing: true
     }
     }

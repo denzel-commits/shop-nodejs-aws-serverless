@@ -12,8 +12,9 @@ const serverlessConfiguration: AWS = {
       includeModules: true,
     },
   },
-  plugins: ['serverless-webpack'],
+  plugins: ['serverless-webpack', 'serverless-dotenv-plugin'],
   package: { individually: true },
+  useDotenv: true,
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -24,6 +25,7 @@ const serverlessConfiguration: AWS = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      S3_BUCKET: '${env:S3_BUCKET}'
     },
     lambdaHashingVersion: '20201221',
 
@@ -31,7 +33,7 @@ const serverlessConfiguration: AWS = {
       {
         Effect: 'Allow',
         Action: 's3:*',
-        Resource: 'arn:aws:s3:::shop-products-source'
+        Resource: 'arn:aws:s3:::${env:S3_BUCKET}'
       }
     ],
   },

@@ -5,9 +5,10 @@ import csv from 'csv-parser';
 import { formatJSONResponse } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
 
-import AWS from "aws-sdk";
+import AWS from 'aws-sdk';
+import '../../config/config';
 
-const BUCKET = 'shop-products-source';
+const BUCKET = process.env.S3_BUCKET;
 
 const importFileParser = async (event) => {
     console.log("importFileParser lambda launched");
