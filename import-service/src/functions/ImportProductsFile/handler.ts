@@ -30,7 +30,7 @@ const importProductsFile: ValidatedEventAPIGatewayProxyEvent<typeof schema> = as
 
       const s3 = new AWS.S3(clientParams);      
       const params = {Bucket: BUCKET, Key: objectKey, Expires: 3600, ContentType: 'text/csv'};
-      const url = s3.getSignedUrl('putObject', params);
+      const url = await s3.getSignedUrlPromise('putObject', params);
       console.log('The URL is', url);
       
       return formatJSONResponse(200, {url});
