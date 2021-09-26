@@ -18,8 +18,8 @@ test("Get signed URL success test", async () => {
   AWSMock.mock("S3", "getSignedUrl", mockedSignedUrl);
 
   const response = await importProductsFileHandler.main(testEvent);
-  const body = JSON.parse(response.body);
-  const signedUrl = body.url;
+  const { body } = JSON.parse(response);
+  const { url: signedUrl } = body;
   const { statusCode } = response;
 
   expect(signedUrl).toBe(mockedSignedUrl);

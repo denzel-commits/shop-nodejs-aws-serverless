@@ -43,6 +43,51 @@ const serverlessConfiguration: AWS = {
     ],
   },
 
+  resources: {
+      Resources: {
+
+        WebAppS3Bucket:{
+          Type: 'AWS::S3::Bucket',
+          Properties: {
+            BucketName: 'auto-source-bucket1',
+            CorsConfiguration:{
+              CorsRules:[
+                {
+                    AllowedHeaders: [
+                        "*"
+                    ],
+                    AllowedMethods: [
+                        "PUT"
+                    ],
+                    AllowedOrigins: [
+                        "*"
+                    ],
+                }
+              ],
+            } 
+          },
+        },
+        WebAppS3BucketPolicy: {
+          Type: 'AWS::S3::BucketPolicy',
+          Properties: {
+            Bucket: {
+              Ref: 'WebAppS3Bucket'
+            },
+            PolicyDocument:{
+              Statement:[{
+                Sid: 'AllowPublicReadWrite',
+                Effect: 'Allow',
+                Action: ['s3:GetObject','s3:PutObject','s3:DeleteObject'],
+                Resource: 'arn:aws:s3:::auto-source-bucket1/*',
+                Principal: '*'
+              }],
+            },
+          },
+        },
+
+      },
+    },
+
   // import the function via paths
   functions: { importProductsFile, importFileParser },
 };

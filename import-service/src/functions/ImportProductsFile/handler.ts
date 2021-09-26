@@ -21,6 +21,12 @@ const importProductsFile: ValidatedEventAPIGatewayProxyEvent<typeof schema> = as
     const objectKey = `uploaded/${fileName}`;
 
     const clientParams = {region: 'eu-west-1'};
+    const params = {
+      Bucket: BUCKET, 
+      Key: objectKey, 
+      Expires: 3600, 
+      ContentType: 'text/csv'
+    };
 
     try{      
       // const putObjectParams = {Bucket: BUCKET, Key: objectKey, ContentType: 'text/csv'};
@@ -29,8 +35,8 @@ const importProductsFile: ValidatedEventAPIGatewayProxyEvent<typeof schema> = as
       // const url = await getSignedUrl(client, command, { expiresIn: 3600 });
 
       const s3 = new AWS.S3(clientParams);      
-      const params = {Bucket: BUCKET, Key: objectKey, Expires: 3600, ContentType: 'text/csv'};
       const url = await s3.getSignedUrlPromise('putObject', params);
+      
       console.log('The URL is', url);
       
       return formatJSONResponse(200, {url});
