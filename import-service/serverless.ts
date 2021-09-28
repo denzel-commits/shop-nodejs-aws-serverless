@@ -2,6 +2,7 @@ import type { AWS } from '@serverless/typescript';
 
 import importProductsFile from '@functions/importProductsFile';
 import importFileParser from '@functions/importFileParser';
+import catalogBatchProcess from '@functions/catalogBatchProcess';
 
 const serverlessConfiguration: AWS = {
   service: 'import-service-s3',
@@ -59,6 +60,22 @@ const serverlessConfiguration: AWS = {
             QueueName: '${env:SQS_QUEUE}'
           }
         },
+        SNSTopic: {
+          Type: 'AWS::SNS::Topic',
+          Properties: {
+            TopicName: '${env:SNS_TOPIC}'
+          }
+        },
+        SNSSubscription:{
+          Type: 'AWS::SNS::Subscription',
+          Properties: {
+            Endpoint: '${env:SNS_ENDPOINT_EMAIL}',
+            Protocol: 'email',
+            TopicArn:{
+              Ref: 'SNSTopic'
+            }
+          }
+        },
 
         // Test Auto bucket
         // WebAppS3Bucket:{
@@ -104,7 +121,7 @@ const serverlessConfiguration: AWS = {
     },
 
   // import the function via paths
-  functions: { importProductsFile, importFileParser },
+  functions: { importProductsFile, importFileParser, catalogBatchProcess },
 };
 
 module.exports = serverlessConfiguration;
