@@ -9,16 +9,18 @@ import AWS from 'aws-sdk';
 import '../../config/config';
 
 const BUCKET = process.env.S3_BUCKET;
+const SQS_URL = process.env.SQS_URL;
 
 const importFileParser = async (event) => {
     console.log("importFileParser lambda launched");
     console.log(event);
     const clientParams = {region: 'eu-west-1'};
-    const results = [];
     const parser = csv({separator: ';'});
 
     try{      
-      const s3 = new AWS.S3(clientParams);
+      AWS.config.update(clientParams);
+      const s3 = new AWS.S3();
+      const sqs = new AWS.SQS();
 
       for(const record of event.Records){
         
@@ -29,19 +31,34 @@ const importFileParser = async (event) => {
 
         s3Stream
         .pipe(parser)
-        .on('data', (data) => results.push(data))
-        .on('end', async () => {
+        .on('data', (data) => {
           //output
-          console.log(results);
+          console.log(data);
 
-          //copy to parsed
+          //send to sqs queue
+          const params = { 
+            QueueUrl: SQS_URL, 
+            MessageBody: JSON.stringify(data)
+          };
+
+          sqs.sendMessage(params, (err, data) => {
+            if (err) {
+              console.log("Error", err);
+            } else {
+              console.log("Success", data);
+            }
+          });
+
+        })
+        .on('end', async () => {
+         //copy to parsed
           await s3.copyObject({
             Bucket: BUCKET,
             CopySource: BUCKET + '/' + record.s3.object.key,
             Key: record.s3.object.key.replace('uploaded', 'parsed')
           }).promise();
 
-          //delete
+          //delete original
           await s3.deleteObject({
             Bucket: BUCKET, 
             Key: record.s3.object.key
