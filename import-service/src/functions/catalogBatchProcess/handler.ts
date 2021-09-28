@@ -13,7 +13,7 @@ const catalogBatchProcess = async (event) => {
 
     try{      
       AWS.config.update(clientParams);
-      const sns = new AWS.SNS();
+      // const sns = new AWS.SNS();
 
       const products = event.Records.map( ({body}) => body );
 
