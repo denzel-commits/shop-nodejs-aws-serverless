@@ -5,6 +5,7 @@ import { middyfy } from '@libs/lambda';
 
 import AWS from 'aws-sdk';
 import '../../config/config';
+import { dbOptions } from '../../config/database-config';
 
 const catalogBatchProcess = async (event) => {
     console.log("catalogBatchProcess lambda launched");
@@ -17,17 +18,17 @@ const catalogBatchProcess = async (event) => {
 
       const products = event.Records.map( ({body}) => body );
 
-      // update DB with products
+      // update DB with batch of products
 
       // send notification to SNS on completion
         
       console.log(products); 
       
-      return formatJSONResponse(200, {message: 'products parsed successfully'});
+      return formatJSONResponse(200, {message: 'Products imported in DB successfully'});
     }catch(e){
-      console.log("Failed to parse data", e);
+      console.log("Failed to import products", e);
       return formatJSONResponse(500, {
-        message: "Failed to parse data"
+        message: "Failed to import products"
       });
     }
 }
