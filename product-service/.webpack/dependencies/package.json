@@ -1,0 +1,14 @@
+{
+  "name": "product-service-rds",
+  "version": "1.0.0",
+  "description": "Packaged externals for product-service-rds",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "source-map-support": "^0.5.19",
+    "pg": "8.7.1",
+    "aws-sdk": "",
+    "@middy/core": "2.5.1",
+    "@middy/http-json-body-parser": "2.5.1"
+  }
+}

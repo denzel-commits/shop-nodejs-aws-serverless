@@ -18,11 +18,28 @@ const catalogBatchProcess = async (event) => {
 
       const products = event.Records.map( ({body}) => body );
 
+      event.Records.forEach( (record) => {
+        console.log('messageAttributes', record.messageAttributes);
+      } );
+
+      const params = {
+        Subject: 'Products import done',
+        Message: JSON.stringify(products),
+        TopicArn: process.env.SNS_ARN
+        };
+
+      sns.publish(params, (err) => {
+        if (err) {
+          console.log("Error", err);
+        } else {
+          console.log("Send product to SNS queue", products);
+        }
+      });
+
       for(const product of products){
 
-          const {title, price, count} = JSON.parse(product);
           console.log('product', product);
-
+    
           // const query = {
           //   // give the query a unique name
           //   name: 'fetch-product',
@@ -42,22 +59,19 @@ const catalogBatchProcess = async (event) => {
           // }
 
           // send notification
-          const params = {
-            Subject: 'Products import done',
-            Message: JSON.stringify(products),
-            TopicArn: process.env.SNS_ARN
-            };
+          // const params = {
+          //   Subject: 'Products import done',
+          //   Message: JSON.stringify(product),
+          //   TopicArn: process.env.SNS_ARN
+          //   };
 
-          sns.publish(params, (err) => {
-            if (err) {
-              console.log("Error", err);
-            } else {
-              console.log("Import products", products);
-            }
-          });
-
-          console.log('params', params);
-          console.log(products); 
+          // sns.publish(params, (err) => {
+          //   if (err) {
+          //     console.log("Error", err);
+          //   } else {
+          //     console.log("Send product to SNS queue", product);
+          //   }
+          // });
       }
       
       return formatJSONResponse(200, {message: 'Products imported in DB successfully'});

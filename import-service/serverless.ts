@@ -2,7 +2,6 @@ import type { AWS } from '@serverless/typescript';
 
 import importProductsFile from '@functions/importProductsFile';
 import importFileParser from '@functions/importFileParser';
-import catalogBatchProcess from '@functions/catalogBatchProcess';
 
 const serverlessConfiguration: AWS = {
   service: 'import-service-s3',
@@ -20,6 +19,7 @@ const serverlessConfiguration: AWS = {
     name: 'aws',
     runtime: 'nodejs14.x',
     region: 'eu-west-1',
+    stage: 'dev',
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -28,12 +28,6 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       S3_BUCKET: '${env:S3_BUCKET}',
       SQS_URL: {Ref: 'SQSQueue'},
-      SNS_ARN: {Ref: 'SNSTopic'},
-      PG_HOST: '${env:PG_HOST}',
-      PG_PORT: '${env:PG_PORT}',
-      PG_DBNAME: '${env:PG_DBNAME}',
-      PG_USERNAME: '${env:PG_USERNAME}',
-      PG_PASSWORD: '${env:PG_PASSWORD}',
     },
     lambdaHashingVersion: '20201221',
 
@@ -54,14 +48,7 @@ const serverlessConfiguration: AWS = {
         Resource: {       
           'Fn::GetAtt': ['SQSQueue', 'Arn']
         },  
-      },
-      {
-        Effect: 'Allow',
-        Action: 'sns:*',
-        Resource: {       
-          'Ref': 'SNSTopic'
-        },  
-      },      
+      },    
     ],
   },
 
@@ -70,51 +57,8 @@ const serverlessConfiguration: AWS = {
         SQSQueue:{
           Type: 'AWS::SQS::Queue',
           Properties: {
-            QueueName: '${env:SQS_QUEUE}'
-
-          }
-        },
-        SNSTopic: {
-          Type: 'AWS::SNS::Topic',
-          Properties: {
-            TopicName: '${env:SNS_TOPIC}',
-          }
-        },
-        SNSSubscription:{
-          Type: 'AWS::SNS::Subscription',
-          Properties: {
-            Endpoint: '${env:SNS_ENDPOINT_EMAIL}',
-            Protocol: 'email',
-            TopicArn:{
-              Ref: 'SNSTopic'
-            },
-            FilterPolicy:{
-              "price": [
-                {
-                  "numeric": [
-                    ">=",
-                    100
-                  ]
-                }
-              ]
-            }
-          }
-        },
-        SNSSubscriptionAlt:{
-          Type: 'AWS::SNS::Subscription',
-          Properties: {
-            Endpoint: '${env:SNS_ENDPOINT_EMAIL_ALT}',
-            Protocol: 'email',
-            TopicArn:{
-              Ref: 'SNSTopic'
-            },
-            FilterPolicy:{
-              "title": [
-                {
-                  "prefix": "Sony"
-                }
-              ]
-            }
+            QueueName: '${env:SQS_QUEUE}',
+            ReceiveMessageWaitTimeSeconds: 20
           }
         },
         // Test Auto bucket
@@ -158,10 +102,27 @@ const serverlessConfiguration: AWS = {
         // },
 
       },
+      Outputs:{
+        SQSQueueArn:{
+          Value: {
+            'Fn::GetAtt': ['SQSQueue', 'Arn']
+          }, 
+          Export: {
+            Name: '${self:provider.stage}-sqs-queue-arn'
+          }
+        }
+      },
     },
 
   // import the function via paths
-  functions: { importProductsFile, importFileParser, catalogBatchProcess },
+  functions: { importProductsFile, importFileParser },
+
+  // Outputs:  
+  // ClientTableStreamArn:
+  //     Description: The ARN for My ClientTable Stream
+  //     Value: !GetAtt ClientTable.StreamArn
+  //     Export:
+  //       Name: my-client-table-stream-arn
 };
 
 module.exports = serverlessConfiguration;

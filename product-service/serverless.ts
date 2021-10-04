@@ -1,7 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
 // import {getProductsList, getProductsById} from './src/functions';
-import {getProductsList, getProductsById, createProduct } from '@functions/index';
+import {getProductsList, getProductsById, createProduct, catalogBatchProcess } from '@functions/index';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service-rds',
@@ -30,12 +30,80 @@ const serverlessConfiguration: AWS = {
       PG_PORT: '${env:PG_PORT}',
       PG_DBNAME: '${env:PG_DBNAME}',
       PG_USERNAME: '${env:PG_USERNAME}',
-      PG_PASSWORD: '${env:PG_PASSWORD}'
+      PG_PASSWORD: '${env:PG_PASSWORD}',
+      SNS_ARN: {Ref: 'SNSTopic'},
     },
     lambdaHashingVersion: '20201221',
+    iamRoleStatements:[
+      {
+        Effect: 'Allow',
+        Action: 'sqs:*',
+        Resource: {       
+          'Fn::ImportValue': '${self:provider.stage}-sqs-queue-arn'
+        },  
+      },
+      {
+        Effect: 'Allow',
+        Action: 'sns:*',
+        Resource: {       
+          'Ref': 'SNSTopic'
+        },  
+      },      
+    ],
   },
+  resources:{
+    Resources:{
+      SNSTopic: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          TopicName: '${env:SNS_TOPIC}',
+        }
+      },
+      SNSSubscription:{
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: '${env:SNS_ENDPOINT_EMAIL_ALT}',
+          Protocol: 'email',
+          TopicArn:{
+            Ref: 'SNSTopic'
+          },
+          FilterPolicy:{
+            "price": [
+              {
+                "numeric": [
+                  ">=",
+                  100
+                ]
+              }
+            ]
+          }
+        }
+      },
+      SNSSubscriptionAlt:{
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: '${env:SNS_ENDPOINT_EMAIL}',
+          Protocol: 'email',
+          TopicArn:{
+            Ref: 'SNSTopic'
+          },
+          FilterPolicy:{
+            "price": [
+              {
+                "numeric": [
+                  "<",
+                  100
+                ]
+              }
+            ]
+          }
+        }
+      },
+    }
+  },
+  
   // import the function via paths
-  functions: { getProductsList, getProductsById, createProduct }
+  functions: { getProductsList, getProductsById, createProduct, catalogBatchProcess }
   
 };
 

@@ -37,23 +37,15 @@ const importFileParser = async (event) => {
 
           //send to sqs queue
           const params = { 
-            QueueUrl: SQS_URL, 
-            MessageBody: JSON.stringify(data),
-            DelaySeconds: 10,
             MessageAttributes: {
-              "title": {
-                DataType: "String",
-                StringValue: data.title
-              },
-              "count": {
-                DataType: "Number",
-                StringValue: data.count
-              },
               "price": {
                 DataType: "Number",
                 StringValue: data.price
               }
             },
+            MessageBody: JSON.stringify(data),
+            QueueUrl: SQS_URL, 
+          // DelaySeconds: 10,
           };
 
           sqs.sendMessage(params, (err, data) => {
