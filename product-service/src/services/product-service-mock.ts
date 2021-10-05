@@ -2,31 +2,27 @@ const getAllProducts = async ():Promise<IProduct[]> => {
     return products;
 }
 
-const findProductById = async (id: string):Promise<IProduct | null> => {
+const findProductById = async (slug: string):Promise<IProduct> => {
+    const product = products.find( (product) => product.id === slug );
 
-    const selectText = 'SELECT * FROM public.products WHERE id = $1';
-    const {rows: products} = await client.query(selectText, [id]);
-
-    if(!products.length){
+    if(!product){
         return null;
     }
   
-    return product[0];
+    return product;
 }
 
-const findProductByTitle = async (client, title: string):Promise<IProduct | null> => {
-    
-    const selectText = 'SELECT * FROM public.products WHERE title = $1';
-    const {rows: products} = await client.query(selectText, [title]);
+const findProductByTitle = async (slug: string):Promise<IProduct> => {
+    const product = products.find( (product) => product.id === slug );
 
-    if(!products.length){
+    if(!product){
         return null;
     }
   
-    return product[0];
+    return product;
 }
 
-const insertProduct = async (client, product: IProduct):Promise<string> => {
+const insertProduct = async (client, product: IProduct):Promise<IProduct[]> => {
 
     const {title, description, price, count} = product;
 
@@ -42,26 +38,26 @@ const insertProduct = async (client, product: IProduct):Promise<string> => {
 
     await client.query('COMMIT');  
 
-    return res.rows[0].id;
+    return res;
 }
 
-const updateProduct = async (client, product: IProduct, id: string):Promise<string> => {
+const updateProduct = async (client, product: IProduct):Promise<IProduct[]> => {
 
     const {title, description, price, count} = product;
- 
+
     // -- BEGIN TRANSACTION
     await client.query('BEGIN');
 
     const queryText = 'UPDATE public.products SET title = $1, description = $2, price = $3 WHERE id = $4';
-    const res = await client.query(queryText, [title, description, price, id]);
+    const res = await client.query(queryText, [title, description, price, products[0].id]);
 
     const updateStocksText = 'UPDATE public.stocks SET count = $1 WHERE product_id = $2';
-    const updateStocksValues = [count, id];
+    const updateStocksValues = [count, products[0].id];
     await client.query(updateStocksText, updateStocksValues);
 
     await client.query('COMMIT');  
 
-    return id;
+    return res;
 }
 
-export {getAllProducts, findProductById, findProductByTitle, insertProducts, updateProducts};
+export {getAllProducts, findProductById, insertProducts, updateProducts};

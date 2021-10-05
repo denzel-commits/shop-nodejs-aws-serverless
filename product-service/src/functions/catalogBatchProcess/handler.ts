@@ -1,11 +1,11 @@
 import 'source-map-support/register';
-import {Client} from 'pg';
-
+import { Client } from 'pg';
 import { formatJSONResponse } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
-
 import AWS from 'aws-sdk';
+
 import { dbOptions } from '../../config/database-config';
+import { findProductByTitle, insertProducts, updateProduct } from '../../services/index';
 
 const catalogBatchProcess = async (event) => {
     console.log("catalogBatchProcess lambda launched");
@@ -32,12 +32,16 @@ const catalogBatchProcess = async (event) => {
 
           const {title, description, price, count} = JSON.parse(product);
 
-          const selectText = 'SELECT id, title FROM public.products WHERE title = $1';
-          const {rows: products} = await client.query(selectText, [title]);
+          // const selectText = 'SELECT id, title FROM public.products WHERE title = $1';
+          // const {rows: products} = await client.query(selectText, [title]);
+
+          // const foundProduct = products[0];
+
+          const foundProduct = findProductByTitle(client, title);
 
           console.log('check product from db with title: ' + title + ', result = ', products);
 
-          if(products.length){
+          if(foundProduct){
             console.log('update product by id', products[0].id);
 
               // -- BEGIN TRANSACTION
