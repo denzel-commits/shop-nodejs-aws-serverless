@@ -1,8 +1,12 @@
+import  { IProduct } from '../interfaces/product';
+
+console.log('product-service imported');
+
 const getAllProducts = async ():Promise<IProduct[]> => {
     return products;
 }
 
-const findProductById = async (id: string):Promise<IProduct | null> => {
+const findProductById = async (client, id: string):Promise<IProduct | null> => {
 
     const selectText = 'SELECT * FROM public.products WHERE id = $1';
     const {rows: products} = await client.query(selectText, [id]);
@@ -11,11 +15,11 @@ const findProductById = async (id: string):Promise<IProduct | null> => {
         return null;
     }
   
-    return product[0];
+    return products[0];
 }
 
 const findProductByTitle = async (client, title: string):Promise<IProduct | null> => {
-    
+
     const selectText = 'SELECT * FROM public.products WHERE title = $1';
     const {rows: products} = await client.query(selectText, [title]);
 
@@ -23,7 +27,7 @@ const findProductByTitle = async (client, title: string):Promise<IProduct | null
         return null;
     }
   
-    return product[0];
+    return products[0];
 }
 
 const insertProduct = async (client, product: IProduct):Promise<string> => {
@@ -64,4 +68,4 @@ const updateProduct = async (client, product: IProduct, id: string):Promise<stri
     return id;
 }
 
-export {getAllProducts, findProductById, findProductByTitle, insertProducts, updateProducts};
+export {getAllProducts, findProductById, findProductByTitle, insertProduct, updateProduct};

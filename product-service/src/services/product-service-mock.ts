@@ -1,9 +1,79 @@
+import  { IProduct } from '../interfaces/product';
+
+const products = [
+    {
+      "count": 4,
+      "description": "Short Product Description1",
+      "id": "7567ec4b-b10c-48c5-9345-fc73c48a80aa",
+      "price": 200,
+      "title": "MARSHALL Emberton"
+    },
+    {
+      "count": 6,
+      "description": "Short Product Description3",
+      "id": "7567ec4b-b10c-48c5-9345-fc73c48a80a0",
+      "price": 50,
+      "title": "Sony SRS-XB12"
+    },
+    {
+      "count": 7,
+      "description": "Portable Bluetooth, Wireless Speaker with Microphone- Soft Black",
+      "id": "7567ec4b-b10c-48c5-9345-fc73c48a80a2",
+      "price": 23,
+      "title": "Bose SoundLink Color II"
+    },
+    {
+      "count": 12,
+      "description": "Waterproof Portable Bluetooth Speaker (Black)",
+      "id": "7567ec4b-b10c-48c5-9345-fc73c48a80a1",
+      "price": 129,
+      "title": "JBL Charge 3"
+    },
+    {
+      "count": 7,
+      "description": "Short Product Description2",
+      "id": "7567ec4b-b10c-48c5-9345-fc73c48a80a3",
+      "price": 50,
+      "title": "JBL Clip 3"
+    },
+    {
+      "count": 8,
+      "description": "Short Product Description4",
+      "id": "7567ec4b-b10c-48c5-9345-fc73348a80a1",
+      "price": 15,
+      "title": "JBL FLIP 4"
+    },
+    {
+      "count": 2,
+      "description": "Short Product Descriptio1",
+      "id": "7567ec4b-b10c-48c5-9445-fc73c48a80a2",
+      "price": 448,
+      "title": "Sony SRS-XP700"
+    },
+    {
+      "count": 3,
+      "description": "Short Product Description7",
+      "id": "7567ec4b-b10c-45c5-9345-fc73c48a80a1",
+      "price": 119,
+      "title": "JBL FLIP 5"
+    },
+    {
+    "count": 3,
+    "description": "Short Product Description7",
+    "id": "7567ec4b-b10c-45c5-9345-fc73c48a80a1",
+    "price": 119,
+    "title": "JBL FLIP 5"
+    }
+    ];
+
+console.log('mock product-service imported');
+
 const getAllProducts = async ():Promise<IProduct[]> => {
     return products;
 }
 
-const findProductById = async (slug: string):Promise<IProduct> => {
-    const product = products.find( (product) => product.id === slug );
+const findProductById = async (_client, id: string):Promise<IProduct> => {
+    const product = products.find( (product) => product.id === id );
 
     if(!product){
         return null;
@@ -12,8 +82,8 @@ const findProductById = async (slug: string):Promise<IProduct> => {
     return product;
 }
 
-const findProductByTitle = async (slug: string):Promise<IProduct> => {
-    const product = products.find( (product) => product.id === slug );
+const findProductByTitle = async (_client, title: string):Promise<IProduct> => {
+    const product = products.find( (product) => product.title === title );
 
     if(!product){
         return null;
@@ -22,42 +92,20 @@ const findProductByTitle = async (slug: string):Promise<IProduct> => {
     return product;
 }
 
-const insertProduct = async (client, product: IProduct):Promise<IProduct[]> => {
+const insertProduct = async (_client, product: IProduct):Promise<IProduct> => {
 
-    const {title, description, price, count} = product;
+    products.push(product);
 
-    // -- BEGIN TRANSACTION
-    await client.query('BEGIN');
+    const { title } = product;
 
-    const queryText = 'INSERT INTO public.products(title, description, price) VALUES($1, $2, $3) RETURNING id';
-    const res = await client.query(queryText, [title, description, price]);
-    
-    const insertStocksText = 'INSERT INTO public.stocks(product_id, count) VALUES ($1, $2)';
-    const insertStocksValues = [res.rows[0].id, count];
-    await client.query(insertStocksText, insertStocksValues);
-
-    await client.query('COMMIT');  
-
-    return res;
+    return await findProductByTitle(_client, title);
 }
 
-const updateProduct = async (client, product: IProduct):Promise<IProduct[]> => {
+const updateProduct = async (_client, product: IProduct):Promise<IProduct> => {
 
-    const {title, description, price, count} = product;
+    // const {title, description, price, count} = product;
 
-    // -- BEGIN TRANSACTION
-    await client.query('BEGIN');
-
-    const queryText = 'UPDATE public.products SET title = $1, description = $2, price = $3 WHERE id = $4';
-    const res = await client.query(queryText, [title, description, price, products[0].id]);
-
-    const updateStocksText = 'UPDATE public.stocks SET count = $1 WHERE product_id = $2';
-    const updateStocksValues = [count, products[0].id];
-    await client.query(updateStocksText, updateStocksValues);
-
-    await client.query('COMMIT');  
-
-    return res;
+    return product;
 }
 
-export {getAllProducts, findProductById, insertProducts, updateProducts};
+export {getAllProducts, findProductById, findProductByTitle, insertProduct, updateProduct};

@@ -1,7 +1,4 @@
-// import products from './mock-products.json';
-import {IProduct} from '../interfaces/product';
-
-const products = [
+export const products = [
     {
       "count": 4,
       "description": "Short Product Description1",
