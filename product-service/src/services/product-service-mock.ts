@@ -101,9 +101,16 @@ const insertProduct = async (_client, product: IProduct):Promise<IProduct> => {
     return await findProductByTitle(_client, title);
 }
 
-const updateProduct = async (_client, product: IProduct):Promise<IProduct> => {
+const updateProduct = async (_client, product: IProduct, id: string):Promise<IProduct> => {
 
-    // const {title, description, price, count} = product;
+    const {title, description, price, count} = product;
+
+    const index = products.findIndex((entry) => entry.id === id);
+
+    products[index].title = title;
+    products[index].description = description;
+    products[index].price = price;
+    products[index].count = count;
 
     return product;
 }

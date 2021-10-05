@@ -45,7 +45,7 @@ const catalogBatchProcess = async (event) => {
           if(foundProduct){
             console.log('update product by id', foundProduct.id);
 
-            await updateProduct(client, product);
+            await updateProduct(client, product, foundProduct.id);
 
               // // -- BEGIN TRANSACTION
               // await client.query('BEGIN');

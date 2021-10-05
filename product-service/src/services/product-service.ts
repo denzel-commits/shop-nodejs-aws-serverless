@@ -3,7 +3,7 @@ import  { IProduct } from '../interfaces/product';
 console.log('product-service imported');
 
 const getAllProducts = async ():Promise<IProduct[]> => {
-    return products;
+    return Array();
 }
 
 const findProductById = async (client, id: string):Promise<IProduct | null> => {
@@ -57,7 +57,7 @@ const updateProduct = async (client, product: IProduct, id: string):Promise<stri
     await client.query('BEGIN');
 
     const queryText = 'UPDATE public.products SET title = $1, description = $2, price = $3 WHERE id = $4';
-    const res = await client.query(queryText, [title, description, price, id]);
+    await client.query(queryText, [title, description, price, id]);
 
     const updateStocksText = 'UPDATE public.stocks SET count = $1 WHERE product_id = $2';
     const updateStocksValues = [count, id];
