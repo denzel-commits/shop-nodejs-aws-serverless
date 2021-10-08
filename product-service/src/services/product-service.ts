@@ -8,6 +8,13 @@ const getAllProducts = async ():Promise<IProduct[]> => {
 
 const findProductById = async (client, id: string):Promise<IProduct | null> => {
 
+    // const query = {
+    //   // give the query a unique name
+    //   name: 'fetch-product',
+    //   text: 'SELECT * FROM user WHERE title = $1',
+    //   values: [product.title],
+    // }
+
     const selectText = 'SELECT * FROM public.products WHERE id = $1';
     const {rows: products} = await client.query(selectText, [id]);
 
