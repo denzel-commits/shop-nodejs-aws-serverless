@@ -52,7 +52,7 @@ const catalogBatchProcess = async (event) => {
             // send notification
             const params = {
               Subject: 'Products import finished',
-              Message: JSON.stringify(products),
+              Message: JSON.stringify(product),
               TopicArn: process.env.SNS_ARN
               };
   
@@ -60,7 +60,7 @@ const catalogBatchProcess = async (event) => {
               if (err) {
                 console.log("Error", err);
               } else {
-                console.log("Send product to SNS queue", products);
+                console.log("Send product to SNS queue", product);
               }
             });
         }
