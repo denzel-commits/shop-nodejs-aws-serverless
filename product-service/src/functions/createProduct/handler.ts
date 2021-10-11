@@ -71,12 +71,17 @@ const createProduct: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
       const insertStocksText = 'INSERT INTO public.stocks(product_id, count) VALUES ($1, $2)';
       const insertStocksValues = [res.rows[0].id, count];
       await client.query(insertStocksText, insertStocksValues);
+
+      // const selectText = 'SELECT a.*, b.count FROM public.products as a 
+      //            LEFT JOIN public.stocks as b ON b.product_id = a.id \
+      //            WHERE a.id = $1';
+      // const product = await client.query(selectText, [res.rows[0].id]);
       
       await client.query('COMMIT');    
 
       event.body.id = res.rows[0].id;
         
-      return formatJSONResponse(HTTP_STATUS_CODES.OK, event.body);
+      return formatJSONResponse(HTTP_STATUS_CODES.OK, event.body); // product
     } catch (e) {
       await client.query('ROLLBACK');
       console.log("ROLLBACK - Failed to add new product", e);

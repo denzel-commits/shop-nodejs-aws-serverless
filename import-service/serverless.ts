@@ -19,13 +19,15 @@ const serverlessConfiguration: AWS = {
     name: 'aws',
     runtime: 'nodejs14.x',
     region: 'eu-west-1',
+    stage: 'dev',
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-      S3_BUCKET: '${env:S3_BUCKET}'
+      S3_BUCKET: '${env:S3_BUCKET}',
+      SQS_URL: {Ref: 'SQSQueue'},
     },
     lambdaHashingVersion: '20201221',
 
@@ -39,12 +41,88 @@ const serverlessConfiguration: AWS = {
         Effect: 'Allow',
         Action: 's3:*',
         Resource: 'arn:aws:s3:::${env:S3_BUCKET}/*'
-      }
+      },
+      {
+        Effect: 'Allow',
+        Action: 'sqs:*',
+        Resource: {       
+          'Fn::GetAtt': ['SQSQueue', 'Arn']
+        },  
+      },    
     ],
   },
 
+  resources: {
+      Resources: {
+        SQSQueue:{
+          Type: 'AWS::SQS::Queue',
+          Properties: {
+            QueueName: '${env:SQS_QUEUE}',
+            ReceiveMessageWaitTimeSeconds: 20
+          }
+        },
+        // Test Auto bucket
+        // WebAppS3Bucket:{
+        //   Type: 'AWS::S3::Bucket',
+        //   Properties: {
+        //     BucketName: 'auto-source-bucket1',
+        //     CorsConfiguration:{
+        //       CorsRules:[
+        //         {
+        //             AllowedHeaders: [
+        //                 "*"
+        //             ],
+        //             AllowedMethods: [
+        //                 "PUT"
+        //             ],
+        //             AllowedOrigins: [
+        //                 "*"
+        //             ],
+        //         }
+        //       ],
+        //     } 
+        //   },
+        // },
+        // WebAppS3BucketPolicy: {
+        //   Type: 'AWS::S3::BucketPolicy',
+        //   Properties: {
+        //     Bucket: {
+        //       Ref: 'WebAppS3Bucket'
+        //     },
+        //     PolicyDocument:{
+        //       Statement:[{
+        //         Sid: 'AllowPublicReadWrite',
+        //         Effect: 'Allow',
+        //         Action: ['s3:GetObject','s3:PutObject','s3:DeleteObject'],
+        //         Resource: 'arn:aws:s3:::auto-source-bucket1/*',
+        //         Principal: '*'
+        //       }],
+        //     },
+        //   },
+        // },
+
+      },
+      Outputs:{
+        SQSQueueArn:{
+          Value: {
+            'Fn::GetAtt': ['SQSQueue', 'Arn']
+          }, 
+          Export: {
+            Name: '${self:provider.stage}-sqs-queue-arn'
+          }
+        }
+      },
+    },
+
   // import the function via paths
   functions: { importProductsFile, importFileParser },
+
+  // Outputs:  
+  // ClientTableStreamArn:
+  //     Description: The ARN for My ClientTable Stream
+  //     Value: !GetAtt ClientTable.StreamArn
+  //     Export:
+  //       Name: my-client-table-stream-arn
 };
 
 module.exports = serverlessConfiguration;

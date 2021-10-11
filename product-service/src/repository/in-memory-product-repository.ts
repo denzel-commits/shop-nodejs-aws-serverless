@@ -1,7 +1,4 @@
-// import products from './mock-products.json';
-import {IProduct} from '../interfaces/product';
-
-const products = [
+export const products = [
     {
       "count": 4,
       "description": "Short Product Description1",
@@ -66,20 +63,3 @@ const products = [
     "title": "JBL FLIP 5"
     }
     ];
-
-
-const getAllProducts = async ():Promise<IProduct[]> => {
-    return products;
-}
-
-const findProductById = async (slug: string):Promise<IProduct> => {
-    const product = products.find( (product) => product.id === slug );
-
-    if(!product){
-        return null;
-    }
-  
-    return product;
-}
-
-export {getAllProducts, findProductById};
