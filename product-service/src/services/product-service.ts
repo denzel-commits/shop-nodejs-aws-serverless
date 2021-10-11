@@ -41,38 +41,53 @@ const insertProduct = async (client, product: IProduct):Promise<string> => {
 
     const {title, description, price, count} = product;
 
-    // -- BEGIN TRANSACTION
-    await client.query('BEGIN');
+    try {
+        // -- BEGIN TRANSACTION
+        await client.query('BEGIN');
 
-    const queryText = 'INSERT INTO public.products(title, description, price) VALUES($1, $2, $3) RETURNING id';
-    const res = await client.query(queryText, [title, description, price]);
+        const queryText = 'INSERT INTO public.products(title, description, price) VALUES($1, $2, $3) RETURNING id';
+        const res = await client.query(queryText, [title, description, price]);
+        
+        const insertStocksText = 'INSERT INTO public.stocks(product_id, count) VALUES ($1, $2)';
+        const insertStocksValues = [res.rows[0].id, count];
+        await client.query(insertStocksText, insertStocksValues);
+
+        await client.query('COMMIT');  
+
+        return res.rows[0].id;
+    } catch (error) {
+        await client.query('ROLLBACK');
+        return '0';
+    }  
     
-    const insertStocksText = 'INSERT INTO public.stocks(product_id, count) VALUES ($1, $2)';
-    const insertStocksValues = [res.rows[0].id, count];
-    await client.query(insertStocksText, insertStocksValues);
-
-    await client.query('COMMIT');  
-
-    return res.rows[0].id;
 }
 
 const updateProduct = async (client, product: IProduct, id: string):Promise<string> => {
 
     const {title, description, price, count} = product;
  
-    // -- BEGIN TRANSACTION
-    await client.query('BEGIN');
+    try {
+        // -- BEGIN TRANSACTION
+        await client.query('BEGIN');
 
-    const queryText = 'UPDATE public.products SET title = $1, description = $2, price = $3 WHERE id = $4';
-    await client.query(queryText, [title, description, price, id]);
+        const queryText = 'UPDATE public.products SET title = $1, description = $2, price = $3 WHERE id = $4';
+        await client.query(queryText, [title, description, price, id]);
 
-    const updateStocksText = 'UPDATE public.stocks SET count = $1 WHERE product_id = $2';
-    const updateStocksValues = [count, id];
-    await client.query(updateStocksText, updateStocksValues);
+        const updateStocksText = 'UPDATE public.stocks SET count = $1 WHERE product_id = $2';
+        const updateStocksValues = [count, id];
+        await client.query(updateStocksText, updateStocksValues);
 
-    await client.query('COMMIT');  
+        await client.query('COMMIT');
 
-    return id;
+        return id;
+        
+    } catch (error) {
+        await client.query('ROLLBACK');
+
+        return '0';
+    }
+
+
 }
 
 export {getAllProducts, findProductById, findProductByTitle, insertProduct, updateProduct};

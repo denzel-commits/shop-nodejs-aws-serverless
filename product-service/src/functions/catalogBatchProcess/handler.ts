@@ -48,24 +48,23 @@ const catalogBatchProcess = async (event) => {
             await insertProduct(client, product);
           }
 
-          if(process.env.NODE_ENV !== 'test'){
-            // send notification
-            const params = {
-              Subject: 'Products import finished',
-              Message: JSON.stringify(product),
-              TopicArn: process.env.SNS_ARN
-              };
-  
-            sns.publish(params, (err) => {
-              if (err) {
-                console.log("Error", err);
-              } else {
-                console.log("Send product to SNS queue", product);
-              }
-            });
-        }
-      }
+          // send notification
+          const params = {
+            Subject: 'Products import finished',
+            Message: JSON.stringify(product),
+            TopicArn: process.env.SNS_ARN
+            };
+
+          sns.publish(params, (err) => {
+            if (err) {
+              console.log("Error", err);
+            } else {
+              console.log("Send product to SNS queue", product);
+            }
+          });
       
+      }
+
       return formatJSONResponse(200, {message: 'Products import finished'});
     }catch(e){
       console.log("Failed to import products", e);

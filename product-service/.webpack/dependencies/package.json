@@ -9,6 +9,7 @@
     "pg": "8.7.1",
     "aws-sdk": "",
     "@middy/core": "2.5.1",
-    "@middy/http-json-body-parser": "2.5.1"
+    "@middy/http-json-body-parser": "2.5.1",
+    "dotenv": ""
   }
 }

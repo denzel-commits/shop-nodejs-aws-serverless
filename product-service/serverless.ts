@@ -12,7 +12,7 @@ const serverlessConfiguration: AWS = {
       includeModules: true,
     },
   },
-  plugins: ['serverless-webpack'],
+  plugins: ['serverless-webpack', 'serverless-dotenv-plugin'],
   package: { individually: true },
   useDotenv: true,
   provider: {
@@ -86,16 +86,6 @@ const serverlessConfiguration: AWS = {
           Protocol: 'email',
           TopicArn:{
             Ref: 'SNSTopic'
-          },
-          FilterPolicy:{
-            "price": [
-              {
-                "numeric": [
-                  "<",
-                  100
-                ]
-              }
-            ]
           }
         }
       },
