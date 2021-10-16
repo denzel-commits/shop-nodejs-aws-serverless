@@ -61,6 +61,32 @@ const serverlessConfiguration: AWS = {
             ReceiveMessageWaitTimeSeconds: 20
           }
         },
+        GatewayResponseDefault4XX:{
+          Type: 'AWS::ApiGateway::GatewayResponse',
+          Properties:{
+            ResponseParameters:{
+              'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+              'gatewayresponse.header.Access-Control-Allow-Headers': "'*'",
+            },
+            ResponseType: 'DEFAULT_4XX',
+            RestApiId:{
+              Ref: 'ApiGatewayRestApi'
+            }
+          },
+        },
+        GatewayResponseDefault5XX:{
+          Type: 'AWS::ApiGateway::GatewayResponse',
+          Properties:{
+            ResponseParameters:{
+              'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+              'gatewayresponse.header.Access-Control-Allow-Headers': "'*'",
+            },
+            ResponseType: 'DEFAULT_5XX',
+            RestApiId:{
+              Ref: 'ApiGatewayRestApi'
+            }
+          },
+        },
         // Test Auto bucket
         // WebAppS3Bucket:{
         //   Type: 'AWS::S3::Bucket',
@@ -116,13 +142,6 @@ const serverlessConfiguration: AWS = {
 
   // import the function via paths
   functions: { importProductsFile, importFileParser },
-
-  // Outputs:  
-  // ClientTableStreamArn:
-  //     Description: The ARN for My ClientTable Stream
-  //     Value: !GetAtt ClientTable.StreamArn
-  //     Export:
-  //       Name: my-client-table-stream-arn
 };
 
 module.exports = serverlessConfiguration;

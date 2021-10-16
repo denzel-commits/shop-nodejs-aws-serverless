@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import hello from '@functions/hello';
+import basicAuthorizer from '@functions/basicAuthorizer';
 
 const serverlessConfiguration: AWS = {
   service: 'authorization-service',
@@ -11,10 +11,14 @@ const serverlessConfiguration: AWS = {
       includeModules: true,
     },
   },
-  plugins: ['serverless-webpack'],
+  plugins: ['serverless-webpack', 'serverless-dotenv-plugin'],
+  package: { individually: true },
+  useDotenv: true,
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
+    region: 'eu-west-1',
+    stage: 'dev',
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -25,7 +29,21 @@ const serverlessConfiguration: AWS = {
     lambdaHashingVersion: '20201221',
   },
   // import the function via paths
-  functions: { hello },
+  functions: { basicAuthorizer },
+
+  resources:{
+      Outputs:{
+        basicAuthorizerLambdaFunctionQualifiedArn:{
+          Value:{
+            'Fn::GetAtt': ['BasicAuthorizerLambdaFunction', 'Arn']
+          },
+          Export: {
+            Name: '${self:provider.stage}-basicAuthorizerLambdaFunctionQualifiedArn'
+          }
+        }
+      },
+  }
 };
+
 
 module.exports = serverlessConfiguration;
