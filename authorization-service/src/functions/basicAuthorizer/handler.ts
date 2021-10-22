@@ -1,12 +1,9 @@
 import 'source-map-support/register';
 
-// import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/apiGateway';
-import { formatJSONResponse } from '@libs/apiGateway';
+import {/*APIGatewayAuthorizerHandler,*/ APIGatewayAuthorizerResult, APIGatewayTokenAuthorizerEvent} from 'aws-lambda';
 import { middyfy } from '@libs/lambda';
 
-// import schema from './schema';
-
-const basicAuthorizer = async (event, _context, callback) => {
+const basicAuthorizer = async (event: APIGatewayTokenAuthorizerEvent, _context, callback) => {
 
   console.log('Auth event', event);
 
@@ -41,16 +38,18 @@ const basicAuthorizer = async (event, _context, callback) => {
 
 }
 
-const generateAimPolicy = (principalId, resource, effect = 'Allow') => {
+function generateAimPolicy(principalId: string, resource, effect = 'Deny'): APIGatewayAuthorizerResult{
   return {
     principalId: principalId,
     policyDocument: {
       Version: '2012-10-17',
-      Statement: {
-        Action: 'execute-api:Invoke',
-        Effect: effect,
-        Resource: resource
-      }
+      Statement: [
+        {
+          Action: 'execute-api:Invoke',
+          Effect: effect,
+          Resource: resource
+        },
+      ],
     }
   }
 }
