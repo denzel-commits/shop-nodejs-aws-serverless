@@ -5,7 +5,7 @@ export default {
   events: [
     {
       sqs: {
-        BatchSize: parseInt('${env:SQS_QUEUE_BATCH_SIZE}'),
+        batchSize: parseInt('${env:SQS_QUEUE_BATCH_SIZE}'),
         arn: {
           'Fn::ImportValue': '${self:provider.stage}-sqs-queue-arn'
         },
