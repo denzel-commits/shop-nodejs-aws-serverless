@@ -1,0 +1,5 @@
+node_modules # To skip potentially modified copies of node_modules/ in the Docker image.
+npm-debug.log # Skip log file to copy to the Docker image.
+Dockerfile # Skip docker image config
+.env # Skip 
+.npmrc
