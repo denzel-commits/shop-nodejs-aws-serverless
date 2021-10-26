@@ -1,5 +1,8 @@
 node_modules # To skip potentially modified copies of node_modules/ in the Docker image.
 npm-debug.log # Skip log file to copy to the Docker image.
 Dockerfile # Skip docker image config
+test # Ignore tests
+dist # Ignore local build
+.elasticbeanstalk
 .env # Skip 
 .npmrc
