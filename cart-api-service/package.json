@@ -19,7 +19,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "eb:deploy": "eb create dev-eb2 --single --cname denzel-commits-cart-api-dev-eb2"
+    "env:create": "eb create dev-eb --single --cname denzel-commits-cart-api-dev-eb",
+    "env:deploy": "eb deploy dev-eb",
+    "env:terminate": "eb terminate dev-eb --all --region eu-west-1"
   },
   "dependencies": {
     "@nestjs/common": "^7.5.1",
