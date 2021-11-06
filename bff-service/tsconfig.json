@@ -22,7 +22,8 @@
       "emitDecoratorMetadata": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
-      "allowSyntheticDefaultImports": true
+      "allowSyntheticDefaultImports": true,
+      "useUnknownInCatchVariables": false,
     },
     "exclude": [
       "node_modules/"

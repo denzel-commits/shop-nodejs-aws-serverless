@@ -46,33 +46,16 @@ app.all('/*', async (req, res, next) => {
 
             console.log('Recipient request failed', JSON.stringify(error));
 
-            // if(error.response){
-            //     const {status, data} = error.response;
+            if(error.response){
+                const {status, data} = error.response;
 
-            //     res.status(status).json(data);
-            // }else{
-            //     res.status(500).json({error: error.message});
-            // }
+                res.status(status).json(data);
+            }else{
+                res.status(500).json({error: error.message});
+            }
             
         }
 
-        // axios(axiosConfig)
-        // .then( function(response){
-        //     console.log('Response from recipient', response.data);
-        //     res.send(response.data);
-        //     }
-        // ).catch(error => {
-            
-        //     console.log('Recipient request failed', JSON.stringify(error));
-
-        //     if(error.response){
-        //         const {status, data} = error.response;
-
-        //         res.status(status).json(data);
-        //     }else{
-        //         res.status(500).json({error: error.message});
-        //     }
-        // });
     }else{
         res.status(502).json({error: 'Cannot process request'});
     }
