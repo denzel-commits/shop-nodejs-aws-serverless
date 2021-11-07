@@ -1,30 +1,28 @@
 import express from 'express';
 import axios, { Method } from 'axios';
 
+import dotenv from 'dotenv';
+import path from 'path';
+
+const DIR_NAME =  path.resolve(path.dirname(''));
+
+dotenv.config({
+  path: path.join(DIR_NAME, './.env.eb'),
+});
+
 const app = express();
 
 app.use(express.json());
-
-// app.use(loggerMiddleware);
 
 app.all('/*', async (req, res, next) => {
     console.log('originalUrl', req.originalUrl);
     console.log('method', req.method);
     console.log('body', req.body);
 
-    // test data
-    // const endpoints = {
-    //     'cart': 'http://denzel-commits-cart-api-dev-eb.eu-west-1.elasticbeanstalk.com/api', 
-    //     'products': 'https://845z6apvdh.execute-api.eu-west-1.amazonaws.com/dev'
-    // };
-    // const recipients = new Map<string, string>(Object.entries(endpoints));
-
-
     const {originalUrl, body} = req;
     const recipient = originalUrl && originalUrl.split('/')[1];
     
     const recipientUrl = recipient && process.env[recipient];
-    // const recipientUrl = recipient && recipients.get(recipient);
 
     console.log('recipient', `${recipientUrl}${req.originalUrl}`);
 
@@ -62,7 +60,5 @@ app.all('/*', async (req, res, next) => {
 
   next();
 });
-
-// app.use(errorMiddleware);
 
 export { app };
