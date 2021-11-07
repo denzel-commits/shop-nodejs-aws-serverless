@@ -6,7 +6,11 @@
   "scripts": {
     "test": "jest",
     "start:dev": "nodemon",
-    "start": "ts-node src/server.ts"
+    "start": "ts-node src/server.ts",
+    "eb:setenv": "eb setenv `cat .env.eb | sed '/^#/ d' | sed '/^$/ d'`",
+    "eb:init": "eb init --platform node.js --region eu-west-1",
+    "eb:create": "eb create dev-bff --single --cname denzel-commits-bff-api-dev-bff",
+    "eb:deploy": "eb deploy dev-bff"
   },
   "author": "",
   "license": "ISC",
