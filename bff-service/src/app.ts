@@ -13,18 +13,18 @@ app.all('/*', async (req, res, next) => {
     console.log('body', req.body);
 
     // test data
-    const endpoints = {
-        'cart': 'http://denzel-commits-cart-api-dev-eb.eu-west-1.elasticbeanstalk.com/api', 
-        'products': 'https://845z6apvdh.execute-api.eu-west-1.amazonaws.com/dev'
-    };
-    const recipients = new Map<string, string>(Object.entries(endpoints));
+    // const endpoints = {
+    //     'cart': 'http://denzel-commits-cart-api-dev-eb.eu-west-1.elasticbeanstalk.com/api', 
+    //     'products': 'https://845z6apvdh.execute-api.eu-west-1.amazonaws.com/dev'
+    // };
+    // const recipients = new Map<string, string>(Object.entries(endpoints));
 
 
     const {originalUrl, body} = req;
     const recipient = originalUrl && originalUrl.split('/')[1];
     
-    // const recipientUrl = recipient && process.env[recipient];
-    const recipientUrl = recipient && recipients.get(recipient);
+    const recipientUrl = recipient && process.env[recipient];
+    // const recipientUrl = recipient && recipients.get(recipient);
 
     console.log('recipient', `${recipientUrl}${req.originalUrl}`);
 
