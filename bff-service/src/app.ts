@@ -2,6 +2,7 @@ import express from 'express';
 import axios, { Method } from 'axios';
 import dotenv from 'dotenv';
 import path from 'path';
+import NodeCache from 'node-cache';
 
 import { Headers } from './interfaces/headers';
 
@@ -10,6 +11,8 @@ const DIR_NAME =  path.resolve(path.dirname(''));
 dotenv.config({
   path: path.join(DIR_NAME, './.env.eb'),
 });
+
+const productsCache = new NodeCache( { stdTTL: 120, checkperiod: 120 } );
 
 const app = express();
 
@@ -28,8 +31,16 @@ app.all('/*', async (req, res, next) => {
 
     console.log('recipient', `${recipientUrl}${req.originalUrl}`);
 
-    if(recipientUrl){
+    if(recipientUrl){        
+        
+        const productsList = (recipient === 'products') ? productsCache.get( "productsList" ):{};
 
+        if (recipient === 'products') req.headers = {};
+        if ( productsList && recipient === 'products' ){
+            console.log('Use cache', productsList);
+            res.send(productsList);
+        }
+        else
         try {
             const axiosConfig = {
                 method: req.method as Method,
@@ -39,6 +50,11 @@ app.all('/*', async (req, res, next) => {
             };
 
             const response = await axios(axiosConfig);
+
+            if(response.data && recipient === 'products') {
+                console.log('Set cache');
+                productsCache.set( "productsList", response.data );
+            }   
 
             console.log('Response from recipient', response.data);
             res.send(response.data);
