@@ -24,6 +24,11 @@ app.all('/*', async (req, res, next) => {
     console.log('body', req.body);
     console.log('headers', req.headers);
 
+    req.originalUrl = req.originalUrl.toLowerCase()
+
+    const cachedEndpoints = ['/products'];    
+    const isCachedEndpoint = cachedEndpoints.includes( req.originalUrl );
+
     const {originalUrl, body} = req;
     const recipient = originalUrl && originalUrl.split('/')[1];
     
@@ -31,12 +36,12 @@ app.all('/*', async (req, res, next) => {
 
     console.log('recipient', `${recipientUrl}${req.originalUrl}`);
 
-    if(recipientUrl){        
+    if(recipientUrl){            
         
-        const productsList = (req.originalUrl === '/products') ? productsCache.get( "productsList" ):{};
+        const productsList = isCachedEndpoint ? productsCache.get( "productsList" ):{};
 
         if (recipient === 'products') req.headers = {};
-        if ( productsList && req.originalUrl === '/products' ){
+        if ( productsList && isCachedEndpoint ){
             console.log('Use cache', productsList);
             res.send(productsList);
         }
@@ -51,7 +56,7 @@ app.all('/*', async (req, res, next) => {
 
             const response = await axios(axiosConfig);
 
-            if(response.data && req.originalUrl === '/products') {
+            if(response.data && isCachedEndpoint) {
                 console.log('Set cache');
                 productsCache.set( "productsList", response.data );
             }   
