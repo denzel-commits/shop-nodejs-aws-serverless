@@ -33,10 +33,10 @@ app.all('/*', async (req, res, next) => {
 
     if(recipientUrl){        
         
-        const productsList = (recipient === 'products') ? productsCache.get( "productsList" ):{};
+        const productsList = (req.originalUrl === '/products') ? productsCache.get( "productsList" ):{};
 
         if (recipient === 'products') req.headers = {};
-        if ( productsList && recipient === 'products' ){
+        if ( productsList && req.originalUrl === '/products' ){
             console.log('Use cache', productsList);
             res.send(productsList);
         }
@@ -51,7 +51,7 @@ app.all('/*', async (req, res, next) => {
 
             const response = await axios(axiosConfig);
 
-            if(response.data && recipient === 'products') {
+            if(response.data && req.originalUrl === '/products') {
                 console.log('Set cache');
                 productsCache.set( "productsList", response.data );
             }   
