@@ -1,8 +1,9 @@
 import express from 'express';
 import axios, { Method } from 'axios';
-
 import dotenv from 'dotenv';
 import path from 'path';
+
+import { Headers } from './interfaces/headers';
 
 const DIR_NAME =  path.resolve(path.dirname(''));
 
@@ -18,6 +19,7 @@ app.all('/*', async (req, res, next) => {
     console.log('originalUrl', req.originalUrl);
     console.log('method', req.method);
     console.log('body', req.body);
+    console.log('headers', req.headers);
 
     const {originalUrl, body} = req;
     const recipient = originalUrl && originalUrl.split('/')[1];
@@ -32,6 +34,7 @@ app.all('/*', async (req, res, next) => {
             const axiosConfig = {
                 method: req.method as Method,
                 url: `${recipientUrl}${req.originalUrl}`,
+                headers: req.headers as Headers,
                 ...((Object.keys(body) || {}).length > 0 && {data: body})
             };
 
